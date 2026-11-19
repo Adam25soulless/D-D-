@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100d14">
+<title>شجرة المسار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#100d14;--s1:#1a1620;--s2:#252030;--line:#3b3243;--gold:#c9a24b;--gold2:#e8cb82;--tx:#ebe1ca;--mu:#a39886;--bad:#d04a3f;--ok:#62ae72;--str:#d1553f;--dex:#5fae6e;--con:#dc9440;--int:#4f8fd0;--wis:#9470cc;--cha:#d46f9f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:radial-gradient(120% 70% at 50% -10%,#2a1d38 0,var(--bg) 58%) fixed;color:var(--tx);font:16px/1.7 Cairo,system-ui,sans-serif;min-height:100vh;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:Amiri,serif;margin:0;line-height:1.35;font-weight:700}
+h1{font-size:30px}h2{font-size:24px}h3{font-size:20px}
+a{color:var(--gold2);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+.bar{position:sticky;top:0;z-index:20;background:rgba(16,13,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:calc(8px + env(safe-area-inset-top)) 16px 8px;display:flex;align-items:center;gap:12px}
+.bar .t{font:700 23px Amiri,serif;color:var(--gold2);flex:1}
+.floor{border:1px solid var(--gold);color:var(--gold2);border-radius:999px;padding:1px 14px;font-size:14px;white-space:nowrap}
+.nav{position:fixed;inset:auto 0 0 0;z-index:20;display:flex;background:#130f18;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav a{flex:1;text-align:center;padding:9px 4px 8px;color:var(--mu);font-size:13px}
+.nav a.on{color:var(--gold2);box-shadow:inset 0 2px 0 var(--gold)}
+.nav svg{display:block;margin:0 auto 1px}
+.card{background:linear-gradient(180deg,var(--s1),#151119);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:inset 0 0 0 3px #15111a,inset 0 0 0 4px #2d2535}
+.row{display:flex;align-items:center;gap:10px}.sp{flex:1;min-width:0}
+.muted{color:var(--mu)}.sm{font-size:14px}
+.btn{background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:8px 16px;cursor:pointer;min-height:44px}
+.btn:hover{border-color:var(--gold)}
+.btn.sm{min-height:34px;padding:2px 12px;font-size:14px}
+.btn.gold{background:linear-gradient(#d9b45a,#a8812f);color:#1a1205;border-color:#e8cb82;font-weight:700}
+.btn.full{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.in{width:100%;background:#0f0c13;border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-height:44px}
+.in:focus{border-color:var(--gold)}
+label.f{display:block;margin:0 0 12px;font-size:14px;color:var(--mu)}
+label.f .in{margin-top:4px;color:var(--tx);font-size:16px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}.tabs .btn{flex:1}.tabs .btn.on{border-color:var(--gold);color:var(--gold2)}
+.auth{max-width:420px;margin:7vh auto 0;padding:16px}
+.auth h1{text-align:center;color:var(--gold2);font-size:40px;margin-bottom:4px}
+.auth p.lead{text-align:center;color:var(--mu);margin:0 0 20px}
+.list .it{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#16121b;color:var(--tx);min-height:52px}
+.list .it:hover{border-color:var(--gold)}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.head h1{flex:1;min-width:0;overflow-wrap:anywhere}
+.info{display:flex;gap:10px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);border-radius:999px;padding:2px 14px;background:#16121b}
+.pill b{color:var(--gold2);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:560px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{position:relative;border:1px solid var(--line);border-radius:14px;padding:14px 8px 10px;text-align:center;background:#16121b}
+.sigil{width:62px;height:62px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;color:var(--c);border:2px solid var(--c);box-shadow:0 0 0 4px #16121b,0 0 0 5px color-mix(in srgb,var(--c) 45%,transparent),inset 0 0 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.stat .v{font:700 32px/1.1 Amiri,serif}
+.stat .v small{font-size:19px;color:var(--gold2)}
+.stat .n{font-size:15px}.stat .cap{font-size:12px;color:var(--mu)}
+.stat .plus{position:absolute;top:6px;inset-inline-start:6px}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.res .c{text-align:center;border:1px solid var(--line);border-radius:12px;padding:10px 4px;background:#16121b;font-size:13px;color:var(--mu);line-height:1.4}
+.res .c svg{color:var(--gold)}.res b{display:block;font:700 28px Amiri,serif;color:var(--tx)}
+.sec{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}.sec h2{flex:1}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(5,3,8,.72);display:flex;align-items:flex-end;justify-content:center}
+.sh{background:var(--s1);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:560px;max-height:90vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom));animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(28px);opacity:0}}
+.step{display:flex;gap:8px;align-items:center;margin-bottom:14px}.step .in{text-align:center;font-size:20px}.step .btn{min-width:48px}
+.toast{position:fixed;inset:auto 16px calc(92px + env(safe-area-inset-bottom)) 16px;z-index:60;max-width:520px;margin:auto;padding:12px 16px;border-radius:12px;background:#2a2232;border:1px solid var(--gold);text-align:center}
+.toast.bad{border-color:var(--bad)}
+.empty{text-align:center;color:var(--mu);padding:24px 0}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.it2{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#16121b}
+.it2 .ds{white-space:pre-wrap;margin:6px 0 0;line-height:1.8;overflow-wrap:anywhere}
+.pill.bad{border-color:var(--bad);background:rgba(208,74,63,.16);color:#ffb3aa}
+.pill.bad b{color:#ffd0ca}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px #15111a;align-self:center}
+.dot.bad{background:var(--bad);box-shadow:0 0 0 3px rgba(208,74,63,.3)}
+.tv{position:relative;height:calc(100dvh - 370px);min-height:340px;border:1px solid var(--line);border-radius:14px;background:#0d0a11;overflow:hidden;touch-action:none;cursor:grab}
+.tv svg{display:block;width:100%;height:100%;user-select:none;-webkit-user-select:none}
+.tv .tools{position:absolute;inset-block-end:10px;inset-inline-start:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.ed{fill:none;stroke:var(--line);stroke-width:2.5}.ed.on{stroke:var(--gold);opacity:.55}
+.nd{color:var(--c,var(--gold));cursor:pointer}
+.nd circle{fill:#16121b;stroke:var(--c,var(--gold));stroke-width:2.5}
+.nd .ring{fill:none;stroke-width:1.5;opacity:.7}
+.nd.available:not(.buy) circle:first-child{stroke-dasharray:5 4}
+.nd.buy circle:first-child{filter:drop-shadow(0 0 9px var(--c,var(--gold)))}
+.nd.purchased{opacity:.5}
+.nd text{fill:var(--tx);font:600 12px Cairo,sans-serif}
+.rw{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;background:#16121b}
+.rw .ds{white-space:pre-wrap;margin:6px 0 0;line-height:1.8;overflow-wrap:anywhere}
+summary{cursor:pointer;font:700 20px Amiri,serif;color:var(--gold2);min-height:32px}
+details.card[open] summary{margin-bottom:4px}
+.arow{display:grid;grid-template-columns:70px 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px}
+.arow .in{min-height:40px;padding:4px 8px;text-align:center}
+.brow{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:#16121b}
+.brow .in{min-height:40px;padding:4px 8px;text-align:center;flex:1;min-width:70px}
+.lg{padding:6px 0;border-bottom:1px solid #2a2230}
+.trow{border:1px solid var(--line);border-inline-start:4px solid var(--c,var(--gold));border-radius:12px;padding:10px 12px;margin-bottom:8px;background:#16121b}
+.trow.del{opacity:.55}.trow.del b{text-decoration:line-through}
+.chip{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--c);border:1.5px solid var(--c);flex:none}
+.bdg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:0 10px;color:var(--mu)}
+.tag.new{border-color:var(--ok);color:#a9dcb3}.tag.mod{border-color:var(--gold);color:var(--gold2)}.tag.rm{border-color:var(--bad);color:#ffb3aa}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+'use strict';
+const SB_URL='https://bohukxuzkgxmmclyftas.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvaHVreHV6a2d4bW1jbHlmdGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwMzg4NDUsImV4cCI6MjExMDYxNDg0NX0.japAzL6ney2nK5YNsOavZLDFJ7RoRnk6RnxXp1hGnqQ';
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const S={me:null};
+const $=(s,r=document)=>r.querySelector(s);
+function h(t,a,...c){const e=document.createElement(t);for(const k in a||{}){const v=a[k];if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(k==='html')e.innerHTML=v;else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v)}for(const x of c.flat(9))if(x!=null&&x!==false)e.append(x.nodeType?x:document.createTextNode(x));return e}
+const ic=(d,s=24)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON={
+ str:'<path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/>',
+ dex:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+ con:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+ int:'<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+ wis:'<path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/>',
+ cha:'<path d="M11.56 3.27a.5.5 0 0 1 .88 0l2.95 5.6a1 1 0 0 0 1.52.3l4.29-3.67a.5.5 0 0 1 .8.52l-2.83 10.25a1 1 0 0 1-.96.73H5.81a1 1 0 0 1-.96-.73L2.02 6.02a.5.5 0 0 1 .8-.52l4.28 3.67a1 1 0 0 0 1.52-.3z"/><path d="M5 21h14"/>',
+ heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+ star:'<path d="M11.53 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.16.75a.53.53 0 0 1 .3.9l-3.74 3.64a2.12 2.12 0 0 0-.6 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.6-1.88L2.16 9.8a.53.53 0 0 1 .3-.9l5.16-.75a2.12 2.12 0 0 0 1.6-1.16z"/>',
+ gem:'<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+ home:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .71-1.53l7-6a2 2 0 0 1 2.58 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.38 3.62a1 1 0 0 1 3 3L7.37 18.64a2 2 0 0 1-.86.5l-2.88.84a.5.5 0 0 1-.62-.62l.84-2.88a2 2 0 0 1 .5-.86z"/>',
+ plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+ copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+ admin:'<path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/>',
+ tree:'<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+ skill:'<path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/>',
+ q:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>'
+};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>String(+(+n).toFixed(2));
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=h('textarea',{style:'position:fixed;opacity:0'});a.value=t;document.body.append(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();if(!ok)throw e}toast('تم النسخ.')}
+const copyBtn=t=>h('button',{class:'btn sm',type:'button',onclick:()=>copyText(t).catch(()=>toast('تعذّر النسخ.',true)),html:ic(ICON.copy,16)+' نسخ الوصف'});
+function confirmSheet(msg,yes,label){const b=h('button',{class:'btn gold full',type:'button'},label||'تأكيد');const sh=sheet('تأكيد',h('div',null,h('p',null,msg),b));b.addEventListener('click',()=>act(b,async()=>{await yes();sh.close()}))}
+function editSheet(title,o,save){
+ const n=h('input',{class:'in',maxlength:80,value:o.name||'','aria-label':o.nameLabel});
+ const v=h('input',{class:'in',type:'number',step:'any',inputmode:'decimal',value:o.num==null?'':o.num,min:o.min,'aria-label':o.numLabel});
+ const d=h('textarea',{class:'in',rows:6,maxlength:2000,style:'resize:vertical'});d.value=o.desc||'';
+ const c=h('span',{class:'muted sm'});const cnt=()=>{c.textContent=d.value.length+' / 2000'};d.addEventListener('input',cnt);cnt();
+ const b=h('button',{class:'btn gold full',type:'button'},'حفظ');
+ const sh=sheet(title,h('div',null,h('label',{class:'f'},o.nameLabel,n),h('label',{class:'f'},o.numLabel,v),h('label',{class:'f'},o.descLabel,d,c),b));
+ b.addEventListener('click',()=>act(b,async()=>{const num=parseFloat(v.value);if(!n.value.trim()){toast('الاسم مطلوب.',true);return}if(!isFinite(num)){toast('أدخل رقمًا صحيحًا.',true);return}await save(n.value,num,d.value||null);sh.close()}))}
+const STATS=[
+ {k:'str',n:'القوة'},{k:'dex',n:'الرشاقة'},{k:'con',n:'الصلابة'},
+ {k:'int',n:'الذكاء'},{k:'wis',n:'الحكمة'},{k:'cha',n:'الكاريزما'}];
+const ERR={
+ bad_login:'اسم المستخدم أو كلمة المرور غير صحيحة.',
+ invalid_username:'اسم المستخدم يتكوّن من 3 إلى 24 حرفًا: أحرف عربية أو إنجليزية صغيرة أو أرقام أو _ . -',
+ invalid_password:'كلمة المرور يجب أن تكون من 8 إلى 72 حرفًا.',
+ username_taken:'اسم المستخدم مستخدم من قبل.',
+ reserved_username:'هذا الاسم محجوز.',
+ registration_closed:'التسجيل مغلق حاليًا.',
+ bad_setup_code:'رمز الإعداد غير صحيح أو سبق استخدامه.',
+ create_failed:'تعذّر إنشاء الحساب، حاول مرة أخرى.',
+ not_authenticated:'انتهت الجلسة، سجّل الدخول من جديد.',
+ forbidden:'ليست لديك صلاحية لهذه العملية.',
+ invalid_name:'الاسم مطلوب ولا يزيد على 80 حرفًا (اسم اللاعب حتى 40).',
+ invalid_amount:'الكمية غير صالحة.',invalid_stat:'الإحصائية غير صالحة.',
+ insufficient_points:'رصيد النقاط لا يكفي.',
+ exceeds_cap:'هذه الزيادة تتجاوز سقف الأحقية.',
+ already_purchased:'سبق شراء هذا الانبثاق.',
+ not_available:'هذا الانبثاق غير متاح للشراء الآن.',
+ description_too_long:'الوصف يزيد على 2000 حرف.',
+ not_found:'العنصر غير موجود.'};
+const say=e=>ERR[e&&e.message]||ERR[e&&e.code]||'تعذّر تنفيذ العملية، حاول مرة أخرى.';
+async function rpc(fn,args){const{data,error}=await sb.rpc(fn,args||{});if(error)throw error;return data}
+function toast(m,bad){const t=h('div',{class:'toast'+(bad?' bad':''),role:'status'},m);document.body.append(t);setTimeout(()=>t.remove(),3200)}
+async function act(btn,fn){btn.disabled=true;try{await fn()}catch(e){toast(say(e),true)}finally{btn.disabled=false}}
+function sheet(title,body,foot){const ov=h('div',{class:'ov',onpointerdown:e=>{if(e.target===ov)close()}});const close=()=>ov.remove();ov.append(h('div',{class:'sh',role:'dialog','aria-label':title},h('div',{class:'row',style:'margin-bottom:12px'},h('h3',{class:'sp'},title),h('button',{class:'btn sm',onclick:close,'aria-label':'إغلاق'},'✕')),body,foot||''));document.body.append(ov);const f=ov.querySelector('input,select,textarea');if(f)f.focus();return{close,ov}}
+const normU=u=>u.trim().toLowerCase();
+async function emailFor(u){const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(u));return 'p'+[...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,40)+'@'+new URL(SB_URL).host}
+async function login(u,p){const{error}=await sb.auth.signInWithPassword({email:await emailFor(normU(u)),password:p});if(error)throw new Error('bad_login')}
+async function register(u,p,code){const r=await fetch(SB_URL+'/functions/v1/register',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY},body:JSON.stringify({username:normU(u),password:p,setup_code:code||''})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'create_failed')}
+
+/* ---- shell + router ---- */
+const routes=[];let stopWatch=null;
+const route=(re,fn)=>routes.push([re,fn]);
+function view(node){const m=$('#main');if(!m)return;m.replaceChildren(node);window.scrollTo(0,0)}
+function watch(fn,ms){const id=setInterval(()=>{const a=document.activeElement;if(!document.hidden&&!$('.ov')&&!(a&&a.matches&&a.matches('input,textarea,select')))fn().catch(()=>{})},ms);stopWatch=()=>clearInterval(id)}
+function drawNav(){const hs=location.hash||'#/',on=(href)=>hs===href||(href==='#/admin'&&hs.startsWith('#/admin'));const items=[['#/','الرئيسية','home'],['#/p/'+S.me.id,'ملفي','user'],['#/tree','الشجرة','tree']];if(S.me.is_admin)items.push(['#/admin','الإدارة','admin']);$('#nav').replaceChildren(...items.map(([href,t,i])=>h('a',{href,class:on(href)?'on':'',html:ic(ICON[i],22)+t})))}
+async function refreshFloor(){const{data}=await sb.from('app_settings').select('current_floor').eq('id',1).single();const f=$('#floor');if(f&&data)f.textContent='الطابق '+data.current_floor}
+function shell(){$('#app').replaceChildren(
+ h('header',{class:'bar'},h('span',{class:'t'},'شجرة المسار'),h('span',{class:'floor',id:'floor'}),h('button',{class:'btn sm',onclick:()=>sb.auth.signOut()},'خروج')),
+ h('main',{class:'wrap',id:'main'}),h('nav',{class:'nav',id:'nav','aria-label':'التنقل'}))}
+async function go(){
+ if(!S.me)return;
+ if(stopWatch){stopWatch();stopWatch=null}
+ drawNav();refreshFloor();
+ const hash=location.hash.slice(1)||'/';
+ for(const[re,fn]of routes){const m=hash.match(re);if(m){try{await fn(...m.slice(1))}catch(e){view(h('div',{class:'card'},say(e)))}return}}
+ location.hash='#/'}
+window.addEventListener('hashchange',go);
+/* ---- auth screen ---- */
+function authScreen(){
+ if(stopWatch){stopWatch();stopWatch=null}
+ let mode='in';
+ const box=h('div',{class:'auth'});
+ const draw=()=>{
+  const u=h('input',{class:'in',autocomplete:'username',autocapitalize:'none',spellcheck:'false'});
+  const p=h('input',{class:'in',type:'password',autocomplete:mode==='in'?'current-password':'new-password'});
+  const p2=h('input',{class:'in',type:'password',autocomplete:'new-password'});
+  const code=h('input',{class:'in',autocomplete:'off',autocapitalize:'characters',spellcheck:'false'});
+  const codeBox=h('label',{class:'f',style:'display:none'},'رمز إعداد DMaster (يُستخدم مرة واحدة)',code);
+  const btn=h('button',{class:'btn gold full',type:'button'},mode==='in'?'دخول':'إنشاء الحساب');
+  u.addEventListener('input',()=>{codeBox.style.display=mode==='up'&&normU(u.value)==='dmaster'?'block':'none'});
+  const submit=()=>act(btn,async()=>{
+   const name=normU(u.value);
+   if(mode==='up'){
+    if(!/^[a-z0-9_.\u0600-\u06FF-]{3,24}$/.test(name))throw new Error('invalid_username');
+    if(p.value.length<8||p.value.length>72)throw new Error('invalid_password');
+    if(p.value!==p2.value){toast('كلمتا المرور غير متطابقتين.',true);return}
+    await register(name,p.value,code.value.trim());
+   }
+   await login(name,p.value);await boot()});
+  btn.addEventListener('click',submit);
+  box.replaceChildren(
+   h('h1',null,'شجرة المسار'),h('p',{class:'lead'},'سجّل الدخول لتفتح ملف شخصيتك ومسارك.'),
+   h('div',{class:'tabs',role:'tablist'},
+    h('button',{class:'btn'+(mode==='in'?' on':''),type:'button',role:'tab','aria-selected':mode==='in',onclick:()=>{mode='in';draw()}},'دخول'),
+    h('button',{class:'btn'+(mode==='up'?' on':''),type:'button',role:'tab','aria-selected':mode==='up',onclick:()=>{mode='up';draw()}},'حساب جديد')),
+   h('div',{class:'card'},
+    h('label',{class:'f'},'اسم المستخدم',u),
+    h('label',{class:'f'},'كلمة المرور',p),
+    mode==='up'?h('label',{class:'f'},'تأكيد كلمة المرور',p2):null,
+    mode==='up'?codeBox:null,
+    btn,
+    mode==='up'?h('p',{class:'muted sm',style:'margin:12px 0 0'},'اسم المستخدم هو هوية الدخول ولا يتغيّر. اسم اللاعب الظاهر في ملفك يمكنك تغييره متى شئت.'):null));
+  [u,p,p2,code].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')submit()}))};
+ $('#app').replaceChildren(box);draw()}
+/* ---- home ---- */
+route(/^\/$/,async()=>{
+ const{data,error}=await sb.from('profiles').select('id,player_name,eligibility').order('player_name');
+ if(error)throw error;
+ const q=h('input',{class:'in',placeholder:'ابحث باسم اللاعب','aria-label':'بحث'});
+ const list=h('div',{class:'list'});
+ const draw=()=>{const k=q.value.trim();const rows=data.filter(p=>p.player_name.includes(k));
+  list.replaceChildren(...(rows.length?rows.map(p=>h('a',{class:'it',href:'#/p/'+p.id},h('span',{class:'sp'},p.player_name),h('span',{class:'muted sm'},'الأحقية '+p.eligibility))):[h('p',{class:'empty'},data.length?'لا يوجد لاعب بهذا الاسم.':'لا يوجد لاعبون بعد.')]))};
+ q.addEventListener('input',draw);draw();
+ view(h('div',null,h('div',{class:'sec'},h('h2',null,'اللاعبون'),h('span',{class:'muted sm'},data.length+' لاعب')),h('div',{style:'margin-bottom:12px'},q),list))});
+
+/* ---- profile ---- */
+route(/^\/p\/([0-9a-f-]{36})$/,async id=>{
+ let last='';
+ const load=async(force)=>{const s=await rpc('get_player_sheet',{p_player:id});const j=JSON.stringify(s);if(!force&&j===last)return;last=j;render(s)};
+ const render=s=>{
+  const P=s.profile,own=id===S.me.id,canEdit=own||S.me.is_admin;
+  const rename=()=>{const i=h('input',{class:'in',maxlength:40,value:P.player_name,'aria-label':'اسم اللاعب'});const b=h('button',{class:'btn gold full',type:'button'},'حفظ الاسم');
+   const sh=sheet('تغيير اسم اللاعب',h('div',null,h('label',{class:'f'},'الاسم الظاهر في الملف',i),b,h('p',{class:'muted sm'},'اسم المستخدم المستخدم في الدخول لا يتغيّر.')));
+   b.addEventListener('click',()=>act(b,async()=>{await rpc('set_player_name',{p_name:i.value,p_player:id});sh.close();toast('تم حفظ الاسم.');await load(true)}))};
+  const allocate=st=>{const base=P.stats.find(x=>x.stat===st.k).base;const max=Math.min(P.unassigned_points,P.stat_cap-base);
+   const n=h('input',{class:'in',type:'number',inputmode:'numeric',min:1,max,value:1,'aria-label':'عدد النقاط'});
+   const clamp=v=>Math.max(1,Math.min(max,v||1));
+   const b=h('button',{class:'btn gold full',type:'button'},'تخصيص');
+   const sh=sheet('تخصيص النقاط: '+st.n,h('div',null,
+    h('p',{class:'muted'},'القيمة الحالية '+base+' · الحد الأقصى '+P.stat_cap+' · نقاطك غير المخصصة '+P.unassigned_points),
+    h('div',{class:'step'},h('button',{class:'btn',type:'button','aria-label':'أنقص',onclick:()=>{n.value=clamp(+n.value-1)}},'−'),n,h('button',{class:'btn',type:'button','aria-label':'زد',onclick:()=>{n.value=clamp(+n.value+1)}},'+')),b));
+   b.addEventListener('click',()=>act(b,async()=>{const a=clamp(parseInt(n.value,10));await rpc('allocate_stat_points',{p_stat:st.k,p_amount:a});sh.close();toast('أُضيفت '+a+' إلى '+st.n+'.');await load(true)}))};
+  const sig=st=>{const x=P.stats.find(y=>y.stat===st.k);const full=x.base>=P.stat_cap;const can=own&&P.unassigned_points>0&&!full;
+   return h('div',{class:'stat',style:'--c:var(--'+st.k+')'},
+    can?h('button',{class:'btn sm plus',type:'button','aria-label':'تخصيص نقاط للقوة'.replace('القوة',st.n),onclick:()=>allocate(st),html:ic(ICON.plus,16)}):null,
+    h('div',{class:'sigil',html:ic(ICON[st.k],30)}),
+    h('div',{class:'v'},h('bdi',{dir:'ltr'},String(x.base),x.bonus>0?h('small',null,'+'+x.bonus):null)),
+    h('div',{class:'n'},st.n),
+    own&&full?h('div',{class:'cap'},'عند سقف الأحقية'):null)};
+  const res=(i,l,v)=>h('div',{class:'c'},h('span',{html:ic(ICON[i],20)}),h('b',null,String(v)),l);
+  view(h('div',null,
+   h('div',{class:'card'},
+    h('div',{class:'head'},h('h1',null,P.player_name),canEdit?h('button',{class:'btn sm',type:'button',onclick:rename,'aria-label':'تغيير الاسم',html:ic(ICON.edit,16)}):null),
+    h('div',{class:'info'},h('span',{class:'pill'},'الطابق: ',h('b',null,P.floor)),h('span',{class:'pill'},'الأحقية: ',h('b',null,P.eligibility)))),
+   h('div',{class:'card'},
+    h('div',{class:'sec'},h('h2',null,'الإحصائيات'),h('span',{class:'muted sm'},'الحد الأقصى '+P.stat_cap)),
+    h('div',{class:'stats'},STATS.map(sig))),
+   h('div',{class:'res',style:'margin-bottom:14px'},
+    res('heart','الصحة',P.health),
+    res('star','نقاط الإحصائيات غير المخصصة',P.unassigned_points),
+    res('gem','نقاط شجرة المسار',P.path_points)),S.me.is_admin?adminCard(P,id,()=>load(true)):null,skillsSection(s.skills,id,own,()=>load(true)),pocketSection(s.pocket,id,own,()=>load(true))))};
+ await load(true);watch(()=>load(false),15000)});
+route(/^\/me$/,async()=>{location.replace('#/p/'+S.me.id)});
+/* ---- skills + pocket ---- */
+function entry(o){return h('div',{class:'it2'},
+ h('div',{class:'row'},h('b',{class:'sp'},o.title),h('span',{class:'pill'},o.badge)),
+ o.tag?h('div',{class:'muted sm'},o.tag):null,
+ o.desc?h('p',{class:'ds'},o.desc):null,
+ (o.desc||o.onEdit||o.onDel)?h('div',{class:'row',style:'gap:8px;margin-top:8px;flex-wrap:wrap'},
+  o.desc?copyBtn(o.desc):null,
+  o.onEdit?h('button',{class:'btn sm',type:'button',onclick:o.onEdit,html:ic(ICON.edit,16)+' تعديل'}):null,
+  o.onDel?h('button',{class:'btn sm',type:'button',onclick:o.onDel,html:ic(ICON.trash,16)+' حذف'}):null):null)}
+function skillsSection(list,id,own,reload){
+ const canAdd=own||S.me.is_admin;
+ const L={nameLabel:'اسم المهارة',numLabel:'مُعدل المهارة',descLabel:'وصف المهارة'};
+ const add=()=>editSheet('مهارة جديدة',L,async(name,num,desc)=>{await rpc('add_skill',{p_name:name,p_modifier:num,p_description:desc,p_player:id});toast('أُضيفت المهارة.');await reload()});
+ return h('div',{class:'card'},
+  h('div',{class:'sec'},h('h2',null,'المهارات'),canAdd?h('button',{class:'btn sm',type:'button',onclick:add,html:ic(ICON.plus,16)+' مهارة'}):null),
+  list.length?list.map(k=>entry({title:k.name,badge:'المُعدل '+fmt(k.modifier),tag:k.source==='tree'?'مكتسبة من شجرة المسار':null,desc:k.description,
+   onEdit:k.can_edit?()=>editSheet('تعديل المهارة',{...L,name:k.name,num:k.modifier,desc:k.description},async(name,num,desc)=>{await rpc('update_skill',{p_skill:k.id,p_name:name,p_modifier:num,p_description:desc});toast('حُفظت المهارة.');await reload()}):null,
+   onDel:k.can_edit?()=>confirmSheet('حذف المهارة «'+k.name+'»؟',async()=>{await rpc('delete_skill',{p_skill:k.id});toast('حُذفت المهارة.');await reload()},'حذف'):null})):h('p',{class:'empty'},'لا توجد مهارات بعد.'))}
+function pocketSection(pk,id,own,reload){
+ const canAdd=own||S.me.is_admin;
+ const L={nameLabel:'اسم الغرض',numLabel:'وزن الغرض',descLabel:'وصف الغرض',min:0};
+ const add=()=>editSheet('غرض جديد',L,async(name,num,desc)=>{await rpc('add_item',{p_name:name,p_weight:num,p_description:desc,p_player:id});toast('أُضيف الغرض.');await reload()});
+ return h('div',{class:'card'},
+  h('div',{class:'sec'},h('span',{class:'dot'+(pk.overweight?' bad':''),role:'img','aria-label':pk.overweight?'الوزن يتجاوز القدرة':'الوزن ضمن القدرة'}),h('h2',null,'الجيب'),canAdd?h('button',{class:'btn sm',type:'button',onclick:add,html:ic(ICON.plus,16)+' غرض'}):null),
+  h('div',{class:'pill'+(pk.overweight?' bad':''),style:'display:inline-block;margin-bottom:12px'},'الوزن ',h('b',null,fmt(pk.total_weight)),' من ',h('b',null,fmt(pk.capacity)),h('span',{class:'muted sm'},' (6 × القوة '+pk.strength+')')),
+  pk.items.length?pk.items.map(i=>entry({title:i.name,badge:'الوزن '+fmt(i.weight),desc:i.description,
+   onEdit:i.can_edit?()=>editSheet('تعديل الغرض',{...L,name:i.name,num:i.weight,desc:i.description},async(name,num,desc)=>{await rpc('update_item',{p_item:i.id,p_name:name,p_weight:num,p_description:desc});toast('حُفظ الغرض.');await reload()}):null,
+   onDel:i.can_edit?()=>confirmSheet('حذف الغرض «'+i.name+'»؟',async()=>{await rpc('delete_item',{p_item:i.id});toast('حُذف الغرض.');await reload()},'حذف'):null})):h('p',{class:'empty'},'الجيب فارغ.'))}
+/* ---- path tree (player view) ---- */
+const W_LEAF=104,H_LEVEL=132;
+function layoutTree(nodes){
+ const ids=new Set(nodes.map(n=>n.id)),kids={},roots=[];
+ nodes.forEach(n=>{if(n.parent_id&&ids.has(n.parent_id))(kids[n.parent_id]=kids[n.parent_id]||[]).push(n);else roots.push(n)});
+ const pos={};let leaf=0,maxD=0;
+ const walk=(n,d)=>{maxD=Math.max(maxD,d);const c=kids[n.id]||[];let x;
+  if(!c.length){x=leaf++*W_LEAF}else{c.forEach(k=>walk(k,d+1));x=(pos[c[0].id].x+pos[c[c.length-1].id].x)/2}
+  pos[n.id]={x,y:d*H_LEVEL,n}};
+ roots.forEach(r=>walk(r,0));
+ const mx=Math.max(leaf-1,0)*W_LEAF;for(const id in pos)pos[id].x=mx-pos[id].x;
+ return{pos,x0:-56,x1:Math.max(leaf-1,0)*W_LEAF+56,y0:-44,y1:maxD*H_LEVEL+72}}
+const nodeIcon=i=>i==='points'?ICON.star:i==='health'?ICON.heart:i==='question'?ICON.q:ICON[i]||ICON.star;
+const nodeColor=i=>({str:'var(--str)',dex:'var(--dex)',con:'var(--con)',int:'var(--int)',wis:'var(--wis)',cha:'var(--cha)'}[i]||'var(--gold)');
+const shortName=s=>s.length>13?s.slice(0,12)+'…':s;
+function treeMarkup(pos){
+ let ed='',nd='';
+ for(const id in pos){const p=pos[id],n=p.n,q=n.parent_id&&pos[n.parent_id];
+  if(q)ed+=`<path class="ed${n.state==='purchased'?' on':''}" d="M${q.x} ${q.y+30}C${q.x} ${(q.y+p.y)/2} ${p.x} ${(q.y+p.y)/2} ${p.x} ${p.y-30}"/>`;
+  nd+=`<g class="nd ${n.state}${n.can_buy?' buy':''}" data-id="${esc(n.id)}" transform="translate(${p.x} ${p.y})" style="--c:${nodeColor(n.icon)}" role="button" aria-label="${esc(n.name)}"><circle r="28"/>${n.state==='purchased'?'<circle class="ring" r="34"/>':''}<g transform="translate(-14 -14) scale(1.16)" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${nodeIcon(n.icon)}</g><text y="52" text-anchor="middle">${esc(shortName(n.name))}</text></g>`}
+ return ed+nd}
+function panZoom(box,g,st,onTap){
+ const pts=new Map();let moved=0,down=null;
+ const apply=()=>g.setAttribute('transform',`translate(${st.x} ${st.y}) scale(${st.k})`);
+ const zoomAt=(mx,my,f)=>{const k=Math.max(.25,Math.min(2.5,st.k*f)),r=k/st.k;st.x=mx-(mx-st.x)*r;st.y=my-(my-st.y)*r;st.k=k;apply()};
+ box.addEventListener('pointerdown',e=>{if(e.target.closest('.tools'))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===1){moved=0;const t=e.target.closest('[data-id]');down=t?t.dataset.id:null}else{down=null;moved=99}try{box.setPointerCapture(e.pointerId)}catch(_){}});
+ box.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+  if(pts.size===1){const dx=e.clientX-p.x,dy=e.clientY-p.y;st.x+=dx;st.y+=dy;moved+=Math.abs(dx)+Math.abs(dy);apply()}
+  else if(pts.size===2){const o=[...pts].find(([i])=>i!==e.pointerId)[1],d0=Math.hypot(p.x-o.x,p.y-o.y),d1=Math.hypot(e.clientX-o.x,e.clientY-o.y),r=box.getBoundingClientRect();if(d0>0)zoomAt((e.clientX+o.x)/2-r.left,(e.clientY+o.y)/2-r.top,d1/d0)}
+  p.x=e.clientX;p.y=e.clientY});
+ const end=e=>{if(!pts.has(e.pointerId))return;pts.delete(e.pointerId);if(!pts.size&&moved<8&&down&&e.type==='pointerup'){const d=down;down=null;onTap(d)}};
+ box.addEventListener('pointerup',end);box.addEventListener('pointercancel',end);
+ box.addEventListener('wheel',e=>{e.preventDefault();const r=box.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:.89)},{passive:false});
+ return{apply,zoomAt}}
+route(/^\/tree$/,async()=>{
+ let T=await rpc('get_tree'),L=layoutTree(T.nodes),last=JSON.stringify(T);
+ const st={x:0,y:0,k:1};
+ const box=h('div',{class:'tv'});box.innerHTML='<svg role="group" aria-label="شجرة المسار"><g></g></svg>';
+ const g=box.querySelector('g'),svg=box.querySelector('svg');
+ const bal=h('b',null),hint=h('p',{class:'muted sm',style:'margin:8px 0 0'});
+ const fit=()=>{const r=box.getBoundingClientRect(),w=L.x1-L.x0;st.k=Math.min(1.1,(r.width-16)/w);st.x=(r.width-w*st.k)/2-L.x0*st.k;st.y=16-L.y0*st.k;pz.apply()};
+ const draw=()=>{g.innerHTML=treeMarkup(L.pos);bal.textContent=T.path_points;
+  hint.textContent=!T.nodes.length?'لم ينشر DMaster شجرة المسار بعد.':!T.has_path?'اختر أحد الخيارات الأولية ليصبح مسارك الأساسي.':'المشتريات تبقى ظاهرة، والمتاح أمامك محاط بخط منقط.'};
+ const open=id=>{const n=T.nodes.find(x=>x.id===id);if(!n)return;
+  const bought=n.state==='purchased',reward=n.icon==='skill'?null:n.reward_text;
+  const buy=h('button',{class:'btn gold',style:'flex:1',type:'button',disabled:bought||!n.can_buy},bought?'تم الشراء':n.can_buy?'شراء':'نقاطك لا تكفي');
+  const copy=(n.icon==='skill'||n.icon==='question')&&n.description?copyBtn(n.description):null;
+  const sh=sheet(n.name,h('div',null,
+   h('div',{class:'row',style:'margin-bottom:6px'},h('div',{class:'sigil',style:'--c:'+nodeColor(n.icon)+';margin:0;width:52px;height:52px',html:ic(nodeIcon(n.icon),26)}),h('div',{class:'sp'},reward?h('b',null,reward):null,h('div',{class:'muted sm'},bought?'مشترى':'غير مشترى'))),
+   n.icon==='skill'?h('div',{class:'rw'},h('div',null,h('b',null,n.skill_name),' · المُعدل ',fmt(n.skill_modifier)),n.description?h('p',{class:'ds'},n.description):null):null,
+   n.icon==='question'&&n.description?h('div',{class:'rw'},h('p',{class:'ds',style:'margin:0'},n.description)):null,
+   h('p',{class:'muted',style:'margin:8px 0 12px'},(bought?'السعر المدفوع: ':'السعر: ')+n.price+' نقطة شجرة'),
+   h('div',{class:'row',style:'gap:8px'},buy,copy)));
+  buy.addEventListener('click',()=>act(buy,async()=>{const r=await rpc('purchase_node',{p_node:n.id});T=r.tree;L=layoutTree(T.nodes);last=JSON.stringify(T);draw();sh.close();toast('تم الشراء'+(n.reward_text?': '+n.reward_text:'')+'.')}))};
+ const pz=panZoom(box,g,st,open);
+ const tool=(t,l,f)=>h('button',{class:'btn sm',type:'button','aria-label':l,onclick:f},t);
+ const r0=()=>box.getBoundingClientRect();
+ box.append(h('div',{class:'tools'},tool('+','تكبير',()=>pz.zoomAt(r0().width/2,r0().height/2,1.25)),tool('−','تصغير',()=>pz.zoomAt(r0().width/2,r0().height/2,.8)),tool('⤢','ملاءمة الشجرة',fit)));
+ view(h('div',null,
+  h('div',{class:'card'},h('div',{class:'row'},h('h2',{class:'sp'},'شجرة المسار'),h('span',{class:'pill'},'نقاطك: ',bal)),hint),box));
+ draw();requestAnimationFrame(fit);
+ watch(async()=>{const n=await rpc('get_tree');const j=JSON.stringify(n);if(j!==last){T=n;L=layoutTree(T.nodes);last=j;draw()}},20000)});
+/* ---- admin: player tools + panel ---- */
+Object.assign(ERR,{has_children:'لا يمكن حذف انبثاق له أبناء. انقل الأبناء أو احذفهم أولًا.',cycle:'هذا النقل يجعل الانبثاق ابنًا لنفسه أو لأحد أبنائه.',invalid_parent:'الانبثاق الأب غير صالح.',invalid_reward:'بيانات المكافأة غير مكتملة لهذا النوع.',invalid_icon:'نوع الأيقونة غير صالح.',invalid_price:'السعر غير صالح.',pending_delete:'هذا الانبثاق مجدول للحذف. تراجع عن الحذف أولًا.',orphan_node:'لا يمكن النشر: يوجد انبثاق أبوه محذوف أو غير منشور.',negative_balance:'الرصيد لا يقبل قيمة سالبة.',invalid_value:'القيمة غير صالحة.',invalid_rank:'الأحقية من 1 إلى 10.',invalid_ids:'ترتيب غير صالح.',invalid_modifier:'المُعدل غير صالح.',invalid_weight:'الوزن غير صالح.',invalid_delta:'أدخل قيمة غير صفرية.',unknown_field:'حقل غير معروف.'});
+const ACT_LABEL={set_player_name:'تغيير اسم لاعب',set_floor:'تغيير الطابق',set_registration:'فتح/إغلاق التسجيل',set_eligibility:'تغيير الأحقية',set_stat:'تعديل إحصائية',set_balance:'تعديل رصيد',set_default_base_stat:'القيمة الابتدائية للإحصائيات',create_node:'إنشاء انبثاق',update_node:'تعديل انبثاق',delete_node:'حذف انبثاق',discard_pending:'تراجع عن تعديل',reorder_nodes:'إعادة ترتيب',publish_tree:'نشر الشجرة',add_skill:'إضافة مهارة',update_skill:'تعديل مهارة',delete_skill:'حذف مهارة',add_item:'إضافة غرض',update_item:'تعديل غرض',delete_item:'حذف غرض',export_backup:'نسخة احتياطية'};
+const ni=(v,l,o)=>h('input',Object.assign({class:'in',type:'number',inputmode:'numeric',value:v,'aria-label':l},o||{}));
+const isInt=v=>Number.isInteger(+v)&&String(v).trim()!=='';
+function adminCard(P,id,reload){
+ const elig=h('select',{class:'in','aria-label':'الأحقية'},[1,2,3,4,5,6,7,8,9,10].map(n=>h('option',{value:n,selected:n===P.eligibility},String(n))));
+ const eb=h('button',{class:'btn sm gold',type:'button'},'حفظ');
+ eb.addEventListener('click',()=>act(eb,async()=>{await rpc('admin_set_eligibility',{p_player:id,p_rank:+elig.value});toast('حُفظت الأحقية.');await reload()}));
+ const statRows=STATS.map(st=>{const x=P.stats.find(y=>y.stat===st.k),b=ni(x.base,st.n+' الأساسية',{min:0}),m=ni(x.bonus,st.n+' المكافأة',{min:0}),sv=h('button',{class:'btn sm',type:'button'},'حفظ');
+  sv.addEventListener('click',()=>act(sv,async()=>{if(!isInt(b.value)||!isInt(m.value)||+b.value<0||+m.value<0){toast('أدخل أعدادًا صحيحة غير سالبة.',true);return}await rpc('admin_set_stat',{p_player:id,p_stat:st.k,p_base:+b.value,p_bonus:+m.value});toast('حُفظت '+st.n+'.');await reload()}));
+  return h('div',{class:'arow'},h('b',null,st.n),b,m,sv)});
+ const bal=(kind,label,cur)=>{const v=ni('',label),call=(fn,args,msg)=>act(v,async()=>{await rpc(fn,Object.assign({p_player:id,p_kind:kind},args));toast(msg);await reload()});
+  const need=()=>{if(!isInt(v.value)){toast('أدخل عددًا صحيحًا.',true);return false}return true};
+  return h('div',{class:'brow'},h('div',{class:'row'},h('b',{class:'sp'},label),h('span',{class:'pill'},'الحالي ',h('b',null,cur))),
+   h('div',{class:'row',style:'gap:6px;margin-top:6px'},v,
+    h('button',{class:'btn sm',type:'button',onclick:()=>{if(need()&&+v.value>0)call('admin_adjust_balance',{p_delta:+v.value},'تمت الإضافة.')}},'+ إضافة'),
+    h('button',{class:'btn sm',type:'button',onclick:()=>{if(need()&&+v.value>0)call('admin_adjust_balance',{p_delta:-v.value},'تم الخصم.')}},'− خصم'),
+    h('button',{class:'btn sm',type:'button',onclick:()=>{if(need())call('admin_set_balance',{p_value:+v.value},'تم التعيين.')}},'تعيين')))};
+ const dt=h('details',{class:'card',open:!!S.adm,ontoggle:()=>{S.adm=dt.open}},h('summary',null,'أدوات DMaster لهذا اللاعب'),
+  h('h3',{style:'margin:12px 0 6px'},'الأحقية'),h('div',{class:'row'},elig,eb),
+  h('h3',{style:'margin:16px 0 6px'},'الإحصائيات'),h('p',{class:'muted sm',style:'margin:0 0 8px'},'تعديلك لا يخضع لقفل الأحقية ولا يُصحَّح تلقائيًا.'),
+  h('div',{class:'arow muted sm'},h('span'),h('span',null,'الأساسية'),h('span',null,'المكافأة'),h('span')),statRows,
+  h('h3',{style:'margin:16px 0 6px'},'الأرصدة'),
+  bal('unassigned','نقاط الإحصائيات غير المخصصة',P.unassigned_points),bal('path','نقاط شجرة المسار',P.path_points),bal('health','الصحة',P.health),
+  h('p',{class:'muted sm',style:'margin:12px 0 0'},'المهارات والأغراض: استخدم أزرار الإضافة والتعديل والحذف في قسميهما أدناه.'));
+ return dt}
+route(/^\/admin$/,async()=>{
+ if(!S.me.is_admin){location.replace('#/');return}
+ const{data:st,error}=await sb.from('app_settings').select('current_floor,registration_open,default_base_stat').eq('id',1).single();if(error)throw error;
+ const{data:logs}=await sb.from('admin_log').select('id,action,details,created_at').order('created_at',{ascending:false}).limit(30);
+ const floor=ni(st.current_floor,'الطابق',{min:0}),fb=h('button',{class:'btn sm gold',type:'button'},'حفظ');
+ fb.addEventListener('click',()=>act(fb,async()=>{if(!isInt(floor.value)||+floor.value<0){toast('أدخل رقمًا صحيحًا.',true);return}await rpc('admin_set_floor',{p_floor:+floor.value});await refreshFloor();toast('تم تحديث الطابق في كل الملفات.')}));
+ const reg=h('input',{type:'checkbox',checked:st.registration_open,id:'reg'});
+ reg.addEventListener('change',()=>act(reg,async()=>{try{await rpc('admin_set_registration',{p_open:reg.checked});toast(reg.checked?'التسجيل مفتوح.':'التسجيل مغلق.')}catch(e){reg.checked=!reg.checked;throw e}}));
+ const base=ni(st.default_base_stat,'القيمة الابتدائية',{min:0}),bb=h('button',{class:'btn sm',type:'button'},'حفظ');
+ bb.addEventListener('click',()=>act(bb,async()=>{if(!isInt(base.value)||+base.value<0){toast('أدخل رقمًا صحيحًا.',true);return}await rpc('admin_set_default_base_stat',{p_value:+base.value});toast('حُفظت القيمة. تنطبق على اللاعبين الجدد فقط.')}));
+ const bk=h('button',{class:'btn',type:'button'},'تنزيل نسخة احتياطية (JSON)');
+ bk.addEventListener('click',()=>act(bk,async()=>{const j=await rpc('admin_export_all');const a=h('a',{href:URL.createObjectURL(new Blob([JSON.stringify(j,null,1)],{type:'application/json'})),download:'backup-'+new Date().toISOString().slice(0,10)+'.json'});document.body.append(a);a.click();a.remove();toast('تم تجهيز النسخة الاحتياطية.')}));
+ const q=h('input',{class:'in',placeholder:'ابحث باسم اللاعب أو اسم المستخدم','aria-label':'بحث'}),list=h('div',{class:'list'});let tm;
+ const find=async()=>{const d=await rpc('admin_list_players',{p_search:q.value.trim()||null});list.replaceChildren(...(d.length?d.map(p=>h('a',{class:'it',href:'#/p/'+p.id},h('span',{class:'sp'},p.player_name),h('span',{class:'muted sm',dir:'ltr'},'@'+p.username))):[h('p',{class:'empty'},'لا يوجد لاعبون مطابقون.')]))};
+ q.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>find().catch(e=>toast(say(e),true)),250)});
+ view(h('div',null,h('h2',{style:'margin-bottom:12px'},'لوحة DMaster'),
+  h('div',{class:'card'},h('h3',{style:'margin-bottom:8px'},'الإعدادات العامة'),
+   h('label',{class:'f'},'الطابق العام (يظهر في ملفات كل اللاعبين)'),h('div',{class:'row',style:'margin:-8px 0 14px'},floor,fb),
+   h('label',{class:'row',for:'reg',style:'margin-bottom:14px;gap:10px'},reg,h('span',null,'السماح بتسجيل حسابات جديدة')),
+   h('label',{class:'f'},'القيمة الابتدائية لكل إحصائية عند إنشاء حساب جديد'),h('div',{class:'row',style:'margin-top:-8px'},base,bb)),
+  h('a',{class:'btn gold full',href:'#/admin/tree',style:'display:block;text-align:center;margin-bottom:14px;line-height:28px'},'إنشاء شجرة المسار وإدارتها'),
+  h('div',{class:'card'},h('h3',{style:'margin-bottom:8px'},'اللاعبون'),h('div',{style:'margin-bottom:10px'},q),list),
+  h('div',{class:'card'},h('h3',{style:'margin-bottom:8px'},'النسخ الاحتياطي'),h('p',{class:'muted sm',style:'margin:0 0 10px'},'ملف يضم اللاعبين والإحصائيات والشجرة والمشتريات والمهارات والأغراض وسجل العمليات. لا يتضمن كلمات المرور.'),bk),
+  h('div',{class:'card'},h('h3',{style:'margin-bottom:8px'},'آخر العمليات الإدارية'),
+   (logs&&logs.length)?logs.map(l=>h('div',{class:'lg'},h('b',null,ACT_LABEL[l.action]||l.action),h('span',{class:'muted sm'},' · '+new Date(l.created_at).toLocaleString('ar'))))
+   :h('p',{class:'empty'},'لا توجد عمليات بعد.'))));
+ find().catch(()=>{})});
+/* ---- admin: path tree editor ---- */
+const TYPES=[['skill','مهارة'],['health','صحة'],['points','نقاط إحصائيات غير مخصصة'],['str','القوة'],['dex','الرشاقة'],['con','الصلابة'],['int','الذكاء'],['wis','الحكمة'],['cha','الكاريزما'],['question','علامة استفهام (؟)']];
+const TYPE_NAME=Object.fromEntries(TYPES);
+const rewardTxt=(i,a)=>{const m={health:' صحة',points:' إحصائية غير مخصصة',str:' قوة',dex:' رشاقة',con:' صلابة',int:' ذكاء',wis:' حكمة',cha:' كاريزما'};return a>0&&m[i]?'+'+a+m[i]:''};
+const effN=n=>{const o=Object.assign({},n,n.pending||{});o.del=!!(n.pending&&n.pending._delete);o.base=n;delete o.pending;return o};
+const lab=(t,...c)=>h('label',{class:'f'},t,...c);
+function mountTree(box,nodes,onTap){
+ const L=layoutTree(nodes),st={x:0,y:0,k:1};
+ box.innerHTML='<svg role="group" aria-label="معاينة الشجرة"><g></g></svg>';
+ const g=box.querySelector('g');g.innerHTML=treeMarkup(L.pos);
+ const pz=panZoom(box,g,st,onTap),r0=()=>box.getBoundingClientRect();
+ const fit=()=>{const r=r0(),w=L.x1-L.x0;st.k=Math.min(1.1,(r.width-16)/w);st.x=(r.width-w*st.k)/2-L.x0*st.k;st.y=16-L.y0*st.k;pz.apply()};
+ const t=(x,l,f)=>h('button',{class:'btn sm',type:'button','aria-label':l,onclick:f},x);
+ box.append(h('div',{class:'tools'},t('+','تكبير',()=>pz.zoomAt(r0().width/2,r0().height/2,1.25)),t('−','تصغير',()=>pz.zoomAt(r0().width/2,r0().height/2,.8)),t('⤢','ملاءمة',fit)));
+ requestAnimationFrame(fit)}
+route(/^\/admin\/tree$/,async()=>{
+ if(!S.me.is_admin){location.replace('#/');return}
+ let A=[],prev=false;const host=h('div');
+ const load=async()=>{A=await rpc('admin_get_tree');draw()};
+ const done=msg=>async()=>{if(msg)toast(msg);await load()};
+ const kidsOf=eff=>{const k={};eff.forEach(n=>{(k[n.parent_id||'']=k[n.parent_id||'']||[]).push(n)});Object.values(k).forEach(a=>a.sort((x,y)=>x.sort_order-y.sort_order));return k};
+ function form(n,parentId){
+  const eff=A.map(effN),kids=kidsOf(eff),bad=new Set(),depth={};
+  const mark=id=>(kids[id]||[]).forEach(c=>{bad.add(c.id);mark(c.id)});if(n){bad.add(n.id);mark(n.id)}
+  const walk=(pid,d)=>(kids[pid||'']||[]).forEach(c=>{depth[c.id]=d;walk(c.id,d+1)});walk(null,0);
+  const V={amount:n&&n.amount!=null?n.amount:'',sname:(n&&n.skill_name)||'',smod:n&&n.skill_modifier!=null?n.skill_modifier:'',desc:(n&&n.description)||''};
+  const name=h('input',{class:'in',maxlength:80,value:n?n.name:'','aria-label':'اسم الانبثاق'});
+  const typ=h('select',{class:'in','aria-label':'نوع الأيقونة'},TYPES.map(([k,l])=>h('option',{value:k,selected:k===(n?n.icon:'str')},l)));
+  const price=ni(n?n.price:0,'السعر',{min:0});
+  const par=h('select',{class:'in','aria-label':'الانبثاق الأب'},h('option',{value:''},'— خيار أولي (بلا أب) —'),...eff.filter(x=>!bad.has(x.id)&&!x.del).sort((a,b)=>(depth[a.id]||0)-(depth[b.id]||0)).map(x=>h('option',{value:x.id,selected:x.id===(n?n.parent_id:parentId)},'· '.repeat(depth[x.id]||0)+x.name)));
+  const box=h('div'),pv=h('p',{class:'muted',style:'margin:-6px 0 12px;font-weight:600'});
+  const bind=(el,k)=>el.addEventListener('input',()=>{V[k]=el.value;if(k==='amount')pv.textContent=rewardTxt(typ.value,parseInt(V.amount,10))});
+  const ta=(k,l)=>{const d=h('textarea',{class:'in',rows:5,maxlength:2000,style:'resize:vertical'});d.value=V.desc;bind(d,'desc');return lab(l,d)};
+  const dyn=()=>{const t=typ.value;box.replaceChildren();
+   if(t==='skill'){const a=h('input',{class:'in',maxlength:80,value:V.sname}),m=h('input',{class:'in',type:'number',step:'any',value:V.smod});bind(a,'sname');bind(m,'smod');box.append(lab('اسم المهارة',a),lab('مُعدل المهارة',m),ta('desc','وصف المهارة (حتى 2000 حرف)'))}
+   else if(t==='question')box.append(ta('desc','الوصف (حتى 2000 حرف)'));
+   else{const a=ni(V.amount,'مقدار المكافأة',{min:1});bind(a,'amount');pv.textContent=rewardTxt(t,parseInt(V.amount,10));box.append(lab('مقدار المكافأة (يظهر الوصف تلقائيًا)',a),pv)}};
+  typ.addEventListener('change',dyn);dyn();
+  const save=h('button',{class:'btn gold full',type:'button'},n?'حفظ التعديل':'إنشاء الانبثاق');
+  const sh=sheet(n?'تعديل الانبثاق':'انبثاق جديد',h('div',null,lab('اسم الانبثاق',name),lab('نوع الأيقونة',typ),lab('السعر بنقاط شجرة المسار',price),lab('الانبثاق الأب',par),box,save));
+  save.addEventListener('click',()=>act(save,async()=>{
+   const t=typ.value,data={name:name.value.trim(),icon:t,price:parseInt(price.value,10),parent_id:par.value||null};
+   if(!data.name){toast('اسم الانبثاق مطلوب.',true);return}
+   if(!(data.price>=0)){toast('السعر غير صالح.',true);return}
+   if(t==='skill'){data.skill_name=V.sname.trim();data.skill_modifier=parseFloat(V.smod);data.description=V.desc||null;data.amount=null;if(!data.skill_name||!isFinite(data.skill_modifier)){toast('اسم المهارة ومُعدلها مطلوبان.',true);return}}
+   else if(t==='question'){data.description=V.desc||null;data.amount=null;data.skill_name=null;data.skill_modifier=null}
+   else{data.amount=parseInt(V.amount,10);data.description=null;data.skill_name=null;data.skill_modifier=null;if(!(data.amount>=1)){toast('مقدار المكافأة مطلوب (1 فأكثر).',true);return}}
+   if(!n){await rpc('admin_create_node',{p_data:data});sh.close();await done('أُنشئ الانبثاق كمسودة. انشر الشجرة ليظهر للاعبين.')();return}
+   const diff={};for(const k in data){const cur=n[k]===undefined?null:n[k];if(JSON.stringify(cur)!==JSON.stringify(data[k]))diff[k]=data[k]}
+   if(!Object.keys(diff).length){toast('لا توجد تغييرات.');return}
+   const r=await rpc('admin_update_node',{p_id:n.id,p_changes:diff});sh.close();await done(r.staged?'حُفظ التعديل كتعديل معلّق. انشر الشجرة ليُطبَّق.':'حُفظ التعديل.')()}))}
+ function rowFor(n,d,sibs){
+  const c=nodeColor(n.icon),pend=n.base.pending&&!n.del,idx=sibs.findIndex(x=>x.id===n.id);
+  const live=A.filter(x=>x.parent_id===n.base.parent_id).sort((a,b)=>a.sort_order-b.sort_order),li=live.findIndex(x=>x.id===n.id);
+  const mv=dir=>act(host,async()=>{const ids=live.map(x=>x.id);const j=li+dir;[ids[li],ids[j]]=[ids[j],ids[li]];await rpc('admin_reorder_children',{p_parent:n.base.parent_id,p_ids:ids});await load()});
+  const parentMoved=n.base.pending&&'parent_id' in n.base.pending;
+  return h('div',{class:'trow'+(n.del?' del':''),style:'margin-inline-start:'+Math.min(d,7)*14+'px;--c:'+c},
+   h('div',{class:'row'},h('span',{class:'chip',html:ic(nodeIcon(n.icon),18)}),h('div',{class:'sp'},h('b',null,n.name),h('div',{class:'muted sm'},TYPE_NAME[n.icon]+(n.icon==='skill'?': '+n.skill_name:rewardTxt(n.icon,n.amount)?' · '+rewardTxt(n.icon,n.amount):''))),h('span',{class:'pill'},n.price+' نقطة')),
+   h('div',{class:'bdg'},n.base.status==='draft'?h('span',{class:'tag new'},'مسودة'):null,pend?h('span',{class:'tag mod'},'تعديل معلّق'):null,n.del?h('span',{class:'tag rm'},'سيُحذف عند النشر'):null,n.base.purchases>0?h('span',{class:'tag'},'اشتراه '+n.base.purchases):null),
+   h('div',{class:'row',style:'gap:6px;flex-wrap:wrap;margin-top:8px'},
+    n.del?null:h('button',{class:'btn sm',type:'button',onclick:()=>form(null,n.id),html:ic(ICON.plus,14)+' ابن'}),
+    n.del?null:h('button',{class:'btn sm',type:'button',onclick:()=>form(n,n.parent_id),html:ic(ICON.edit,14)+' تعديل'}),
+    n.del||parentMoved||li<1?null:h('button',{class:'btn sm',type:'button','aria-label':'قدّم في الترتيب',onclick:()=>mv(-1)},'↑'),
+    n.del||parentMoved||li<0||li>=live.length-1?null:h('button',{class:'btn sm',type:'button','aria-label':'أخّر في الترتيب',onclick:()=>mv(1)},'↓'),
+    n.base.pending?h('button',{class:'btn sm',type:'button',onclick:()=>act(host,async()=>{await rpc('admin_discard_pending',{p_id:n.id});await done('تم التراجع عن التعديل المعلّق.')()})},'تراجع'):null,
+    n.del?null:h('button',{class:'btn sm',type:'button',onclick:()=>confirmSheet('حذف «'+n.name+'»؟'+(n.base.status==='draft'?'':' سيُطبَّق الحذف عند النشر، ولن يفقد من اشتراه مكافأته.'),async()=>{await rpc('admin_delete_node',{p_id:n.id});await done('تم الحذف.')()},'حذف'),html:ic(ICON.trash,14)+' حذف'})))}
+ function draw(){
+  const eff=A.map(effN),kids=kidsOf(eff),pending=A.filter(n=>n.status==='draft'||n.pending).length,rows=[];
+  const walk=(pid,d)=>(kids[pid||'']||[]).forEach(n=>{rows.push(rowFor(n,d,kids[pid||'']));walk(n.id,d+1)});walk(null,0);
+  const pub=h('button',{class:'btn gold',type:'button',disabled:!pending},'نشر التعديلات'+(pending?' ('+pending+')':''));
+  pub.addEventListener('click',()=>confirmSheet('سيُطبَّق '+pending+' تغيير على شجرة اللاعبين فورًا. متابعة؟',async()=>{const r=await rpc('admin_publish_tree');await done('نُشرت الشجرة: جديد '+r.published+' · معدّل '+r.updated+' · محذوف '+r.deleted+'.')()},'نشر'));
+  const pbtn=h('button',{class:'btn',type:'button',onclick:()=>{prev=!prev;draw()}},prev?'إخفاء المعاينة':'معاينة الشجرة');
+  let pbox=null;
+  if(prev){pbox=h('div',{class:'tv',style:'height:55dvh;margin-bottom:14px'});
+   const nodes=eff.filter(n=>!n.del).map(n=>({id:n.id,parent_id:n.parent_id,name:n.name,icon:n.icon,price:n.price,amount:n.amount,skill_name:n.skill_name,skill_modifier:n.skill_modifier,description:n.description,reward_text:rewardTxt(n.icon,n.amount),state:'available',can_buy:n.base.status==='draft'||!!n.base.pending}));
+   requestAnimationFrame(()=>mountTree(pbox,nodes,id=>{const n=nodes.find(x=>x.id===id);if(!n)return;sheet(n.name,h('div',null,h('p',null,h('b',null,TYPE_NAME[n.icon]),n.icon==='skill'?' · '+n.skill_name+' · المُعدل '+fmt(n.skill_modifier):n.reward_text?' · '+n.reward_text:''),n.description?h('p',{class:'ds',style:'white-space:pre-wrap'},n.description):null,h('p',{class:'muted'},'السعر: '+n.price+' نقطة شجرة')))}))}
+  host.replaceChildren(...[
+   h('div',{class:'card'},h('div',{class:'row',style:'flex-wrap:wrap;gap:8px'},pub,pbtn,h('button',{class:'btn',type:'button',onclick:()=>form(null,null),html:ic(ICON.plus,16)+' خيار أولي'})),
+    h('p',{class:'muted sm',style:'margin:10px 0 0'},'ما تنشئه أو تعدّله يبقى مخفيًا عن اللاعبين حتى تضغط «نشر». في المعاينة، المتوهّج هو الجديد أو المعدّل.')),
+   pbox,...(rows.length?rows:[h('p',{class:'empty'},'لا توجد انبثاقات بعد. ابدأ بإضافة الخيارات الأولية التي ستظهر للاعبين الجدد.')])].filter(Boolean))}
+ view(h('div',null,h('div',{class:'sec'},h('h2',null,'محرر شجرة المسار'),h('a',{class:'btn sm',href:'#/admin'},'→ الإدارة')),host));
+ await load()});
+/* ---- boot ---- */
+async function boot(){
+ const{data:{session}}=await sb.auth.getSession();
+ S.me=null;
+ if(session){try{S.me=await rpc('me')}catch(e){}}
+ if(!S.me){if(session)await sb.auth.signOut();return authScreen()}
+ shell();go()}
+sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){S.me=null;authScreen()}});
+boot();
+</script>
+</body>
+</html>
